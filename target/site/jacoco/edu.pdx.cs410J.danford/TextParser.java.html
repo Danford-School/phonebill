@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TextParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">CS410J Phone Bill Project</a> &gt; <a href="index.source.html" class="el_package">edu.pdx.cs410J.danford</a> &gt; <span class="el_source">TextParser.java</span></div><h1>TextParser.java</h1><pre class="source lang-java linenums">package edu.pdx.cs410J.danford;
+
+import edu.pdx.cs410J.AbstractPhoneBill;
+import edu.pdx.cs410J.ParserException;
+import edu.pdx.cs410J.PhoneBillParser;
+
+<span class="fc" id="L7">public class TextParser implements PhoneBillParser {</span>
+
+    /**
+     * This is the override, but I don't use it. I like arguments.
+     * @return Nope.
+     * @throws ParserException It sure will.
+     */
+    @Override
+    public AbstractPhoneBill parse() throws ParserException {
+<span class="fc" id="L16">        throw new ParserException(&quot;parse(String, PhoneBill)&quot;);</span>
+    }
+
+    /**
+     * This is the parse that I actually use. It parses a string in the correct format. The checks should make it fail
+     * if the data is wrong.
+     * @param line The string from a file that gets parsed.
+     * @param bill The bill that the parsed data gets added to
+     * @return Returns the updated bill when it's done
+     * @throws ParserException It does, it really does.
+     */
+    public AbstractPhoneBill parse(String line, PhoneBill bill) throws ParserException {
+<span class="fc" id="L28">        String[] temp = line.split(&quot;,&quot;);</span>
+<span class="fc" id="L29">        bill.CustomersName = temp[0];</span>
+<span class="fc" id="L30">        PhoneCall call = new PhoneCall();</span>
+<span class="fc" id="L31">        call.theCustomer = temp[0];</span>
+<span class="fc" id="L32">        call.theCustomersNumber = phoneNumberCheck(temp[1]);</span>
+<span class="fc" id="L33">        call.isCallingThisNumber = phoneNumberCheck(temp[2]);</span>
+<span class="fc" id="L34">        call.thisIsTheStartDate = dateChecker(temp[3]);</span>
+<span class="fc" id="L35">        call.thisIsTheStartTime = timeChecker(temp[4]);</span>
+<span class="fc" id="L36">        call.startTimeAMPM = checkAMPM(temp[5]);</span>
+<span class="fc" id="L37">        call.thisIsTheEndDate = dateChecker(temp[6]);</span>
+<span class="fc" id="L38">        call.thisIsTheEndTime = timeChecker(temp[7]);</span>
+<span class="fc" id="L39">        call.endTimeAMPM = checkAMPM(temp[8]);</span>
+<span class="fc" id="L40">        call.startTimeAndDate = fakeDateString(call.thisIsTheStartDate, call.thisIsTheStartTime, call.startTimeAMPM);</span>
+<span class="fc" id="L41">        call.endTimeAndDate = fakeDateString(call.thisIsTheEndDate, call.thisIsTheEndTime, call.endTimeAMPM);</span>
+<span class="fc" id="L42">        bill.phoneCallList.add(call);</span>
+<span class="fc" id="L43">        return bill;</span>
+    }
+
+    /**
+     * This just checks to ensure that AM or PM has been selected.
+     * @param AMPM The AM or PM field of a call
+     * @return Returns the string if it is correct
+     */
+    public static String checkAMPM(String AMPM) {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        if(AMPM.contains(&quot;AM&quot;) | AMPM.contains(&quot;am&quot;) | AMPM.contains(&quot;PM&quot;) | AMPM.contains(&quot;pm&quot;)) {</span>
+<span class="fc" id="L53">            return AMPM.toLowerCase();</span>
+        } else {
+<span class="nc" id="L55">            System.err.println(&quot;AM or PM required (Case insensitive)&quot;);</span>
+<span class="nc" id="L56">            throw new IllegalArgumentException();</span>
+        }
+    }
+
+    /**
+     * This checks to ensure the time is in the correct format using regex
+     * It returns the date or an IllegalArgumentException()
+     * @param time A string of the time that is being checked
+     * @return Returns the time if it passes the test.
+     */
+    public static String timeChecker(String time) {
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (!time.matches(&quot;(1[012]|[1-9]):[0-5][0-9]&quot;)) {</span>
+<span class="nc" id="L68">            System.out.println(&quot;\nThe time is not valid.\nPlease use the form hh:mm or h:mm\n&quot;);</span>
+<span class="nc" id="L69">            throw new IllegalArgumentException();</span>
+        }
+<span class="fc" id="L71">        return time;</span>
+    }
+
+    /**
+     * This checks to ensure the date is in the correct format using regex.
+     * It returns the number if it is acceptable, or an IllegalArgumentException
+     * @param date A string of the date being checked
+     * @return Returns the phone number if it passes
+     */
+    public static String dateChecker(String date) {
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if(!date.matches(&quot;^[0-3]?[0-9]/[0-3]?[0-9]/(?:[0-9]{2})?[0-9]{2}$&quot;)) {</span>
+<span class="nc" id="L82">            System.out.println(&quot;\nThe date is not valid.\nPlease use the form mm/dd/yyyy, m/dd/yyyy, mm/d/yyyy, or m/d/yyyy\n&quot;);</span>
+<span class="nc" id="L83">            throw new IllegalArgumentException();</span>
+        }
+<span class="fc" id="L85">        return date;</span>
+    }
+
+    /**
+     * This checks to ensure the phone number is in the correct format using regex.
+     * It returns the phone number or an IllegalArgumentException
+     * @param aPhoneNumber A string of the phone number that is being tested
+     * @return This returns the phone number on success.
+     */
+    public static String phoneNumberCheck(String aPhoneNumber) {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (!aPhoneNumber.matches(&quot;\\d{3}-\\d{3}-\\d{4}&quot;)) {</span>
+<span class="nc" id="L96">            System.out.println(&quot;\nThe phone number is not in the correct format.\nPlease use ###-###-####\n&quot;);</span>
+<span class="nc" id="L97">            throw new IllegalArgumentException();</span>
+        }
+<span class="fc" id="L99">        return aPhoneNumber;</span>
+    }
+
+    /**
+     * This is my work-around for date. I will need to fix the date objects in the next version
+     * @param date The date of the call in question
+     * @param time The time of the call in question
+     * @param AMPM The am/pm associated with the time of the call in question
+     * @return A string of all of these things that looks pretty. Maybe need a comma?
+     */
+    public String fakeDateString(String date, String time, String AMPM) {
+<span class="fc" id="L110">        return date.concat(&quot;, &quot;).concat(time).concat(&quot; &quot;).concat(AMPM);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
